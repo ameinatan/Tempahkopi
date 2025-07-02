@@ -1,0 +1,95 @@
+
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tempah Air Kopi Classic</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f5f5f5;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 2rem;
+      max-width: 500px;
+      margin: auto;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      color: #4a2c2a;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 1rem;
+      margin: 1rem 0;
+      font-size: 1rem;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background: #4a2c2a;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #6b3e3a;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Tempah Air Kopi Classic</h1>
+    <p>Isi maklumat anda di bawah untuk buat tempahan</p>
+
+    <input type="text" id="name" placeholder="Nama Penuh" required />
+    <input type="text" id="phone" placeholder="Nombor Telefon" required />
+    <input type="number" id="quantity" placeholder="Bilangan botol" required />
+
+    <button onclick="hantarTempahan()">Hantar Tempahan ke Telegram</button>
+  </div>
+
+  <script>
+    function hantarTempahan() {
+      const name = document.getElementById('name').value;
+      const phone = document.getElementById('phone').value;
+      const quantity = document.getElementById('quantity').value;
+
+      if (!name || !phone || !quantity) {
+        alert("Sila lengkapkan semua maklumat.");
+        return;
+      }
+
+      const message = `Tempahan Baharu Air Kopi Classic%0A👤 Nama: ${name}%0A📞 Telefon: ${phone}%0A🧴 Jumlah: ${quantity} botol`;
+
+      const token = 'YOUR_BOT_TOKEN';
+      const chat_id = 'YOUR_CHAT_ID';
+
+      const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${message}`;
+
+      fetch(url)
+        .then(response => {
+          if (response.ok) {
+            alert("Tempahan berjaya dihantar!");
+            document.getElementById('name').value = '';
+            document.getElementById('phone').value = '';
+            document.getElementById('quantity').value = '';
+          } else {
+            alert("Ralat semasa menghantar tempahan.");
+          }
+        });
+    }
+  </script>
+
+</body>
+</html>
