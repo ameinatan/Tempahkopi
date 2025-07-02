@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Tempah Air Kopi Classic</title>
+  <title>Tempahan Air Kopi Classic</title>
   <style>
     body {
       font-family: sans-serif;
@@ -11,21 +11,18 @@
       text-align: center;
       padding: 2rem;
     }
-
     .container {
       background: white;
       border-radius: 20px;
       padding: 2rem;
-      max-width: 500px;
+      max-width: 600px;
       margin: auto;
       box-shadow: 0 0 20px rgba(0,0,0,0.1);
     }
-
     h1 {
       color: #4a2c2a;
     }
-
-    input, button {
+    input, select, button {
       width: 100%;
       padding: 1rem;
       margin: 1rem 0;
@@ -33,13 +30,27 @@
       border-radius: 10px;
       border: 1px solid #ccc;
     }
-
+    .menu-group {
+      text-align: left;
+      margin: 1rem 0;
+    }
+    .menu-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 0.5rem 0;
+    }
+    .menu-item label {
+      flex: 1;
+    }
+    .menu-item input[type='number'] {
+      width: 80px;
+    }
     button {
       background: #4a2c2a;
       color: white;
       cursor: pointer;
     }
-
     button:hover {
       background: #6b3e3a;
     }
@@ -48,44 +59,111 @@
 <body>
 
   <div class="container">
-    <h1>Tempah Air Kopi Classic</h1>
-    <p>Isi maklumat anda di bawah untuk buat tempahan</p>
-
+    <h1>Tempah Minuman Anda</h1>
     <input type="text" id="name" placeholder="Nama Penuh" required />
     <input type="text" id="phone" placeholder="Nombor Telefon" required />
-    <input type="number" id="quantity" placeholder="Bilangan botol" required />
 
+    <div class="menu-group">
+      <h3>Menu Minuman</h3>
+      <div class="menu-item"><label>Kopi Latte (RM7)</label><input type="number" id="latte" min="0" value="0" /></div>
+      <div class="menu-item"><label>Kopi Americano (RM7)</label><input type="number" id="americano" min="0" value="0" /></div>
+      <div class="menu-item"><label>Kopi Mocha (RM7)</label><input type="number" id="mocha" min="0" value="0" /></div>
+      <div class="menu-item"><label>Coklat (RM7)</label><input type="number" id="coklat" min="0" value="0" /></div>
+      <div class="menu-item"><label>Strawberry (RM7)</label><input type="number" id="strawberry" min="0" value="0" /></div>
+      <div class="menu-item"><label>Milk Shake (RM7)</label><input type="number" id="milkshake" min="0" value="0" /></div>
+      <div class="menu-item"><label>Chocolate Strawberry (RM10)</label><input type="number" id="chocstraw" min="0" value="0" /></div>
+    </div>
+
+    <div class="menu-group">
+      <h3>Add-On</h3>
+      <label><input type="checkbox" id="add_cream" value="2"> Whipped Cream (RM2)</label><br/>
+      <label><input type="checkbox" id="add_choco" value="2"> Filler Coklat (RM2)</label><br/>
+      <label><input type="checkbox" id="add_straw" value="2"> Filler Strawberry (RM2)</label>
+    </div>
+
+    <p><strong>Total: RM <span id="total">0</span></strong></p>
+    <button onclick="kiraTotal()">Kira Jumlah</button>
     <button onclick="hantarTempahan()">Hantar Tempahan ke Telegram</button>
   </div>
 
   <script>
+    function kiraTotal() {
+      const prices = {
+        latte: 7,
+        americano: 7,
+        mocha: 7,
+        coklat: 7,
+        strawberry: 7,
+        milkshake: 7,
+        chocstraw: 10
+      };
+
+      let total = 0;
+      for (let item in prices) {
+        const qty = parseInt(document.getElementById(item).value) || 0;
+        total += qty * prices[item];
+      }
+
+      if (document.getElementById('add_cream').checked) total += 2;
+      if (document.getElementById('add_choco').checked) total += 2;
+      if (document.getElementById('add_straw').checked) total += 2;
+
+      document.getElementById('total').textContent = total;
+    }
+
     function hantarTempahan() {
       const name = document.getElementById('name').value;
       const phone = document.getElementById('phone').value;
-      const quantity = document.getElementById('quantity').value;
+      const total = document.getElementById('total').textContent;
 
-      if (!name || !phone || !quantity) {
-        alert("Sila lengkapkan semua maklumat.");
+      if (!name || !phone || total === "0") {
+        alert("Sila lengkapkan maklumat dan kira jumlah dahulu.");
         return;
       }
 
-      const message = `Tempahan Baharu Air Kopi Classic%0A👤 Nama: ${name}%0A📞 Telefon: ${phone}%0A🧴 Jumlah: ${quantity} botol`;
+      const orders = [
+        { id: 'latte', label: 'Kopi Latte' },
+        { id: 'americano', label: 'Kopi Americano' },
+        { id: 'mocha', label: 'Kopi Mocha' },
+        { id: 'coklat', label: 'Coklat' },
+        { id: 'strawberry', label: 'Strawberry' },
+        { id: 'milkshake', label: 'Milk Shake' },
+        { id: 'chocstraw', label: 'Chocolate Strawberry' }
+      ];
+
+      let orderText = "";
+      orders.forEach(order => {
+        const qty = parseInt(document.getElementById(order.id).value);
+        if (qty > 0) {
+          orderText += `☕ ${order.label}: ${qty}x\n`;
+        }
+      });
+
+      const addons = [];
+      if (document.getElementById('add_cream').checked) addons.push("Whipped Cream");
+      if (document.getElementById('add_choco').checked) addons.push("Filler Coklat");
+      if (document.getElementById('add_straw').checked) addons.push("Filler Strawberry");
+
+      const message = 
+        `Tempahan Baru Minuman:%0A` +
+        `👤 Nama: ${name}%0A` +
+        `📞 Telefon: ${phone}%0A` +
+        orderText +
+        `➕ Add-on: ${addons.join(", ") || "Tiada"}%0A` +
+        `💵 Jumlah Bayaran: RM${total}`;
+
 
       const token = '7806286768:AAHq-XDZ9LTtjpCkCfZZV_TAM1xV-B5DJIM';
       const chat_id = '@ameinatan';
-
       const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${message}`;
 
       fetch(url)
         .then(response => {
           if (response.ok) {
             alert("Tempahan berjaya dihantar!");
-            document.getElementById('name').value = '';
-            document.getElementById('phone').value = '';
-            document.getElementById('quantity').value = '';
+            location.reload();
           } else {
-            alert("Ralat sem
-asa menghantar tempahan.");
+            alert("Ralat semasa menghantar tempahan.");
           }
         });
     }
@@ -93,3 +171,4 @@ asa menghantar tempahan.");
 
 </body>
 </html>
+
